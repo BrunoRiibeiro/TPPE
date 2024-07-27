@@ -10,54 +10,85 @@ public class Venda {
     private Cliente cliente;
     private Produto[] itens;
     private String metodoPagamento;
-    private Boolean cashbackIsUsed;
-    private float imposto;
-    private float valor;
+    private float icms;
+    private float impostoMunicipal;
+    private float valor = 0.0f;
     private float frete;
     private float desconto;
 
-    public Venda(LocalDate data, Cliente cliente, Produto[] itens, String metodoPagamento, Boolean cashbackIsUsed, float imposto, float valor, float frete, float desconto) {
+    public Venda(LocalDate data, Cliente cliente, Produto[] itens, String metodoPagamento) {
         this.data = data;
         this.cliente = cliente;
         this.itens = itens;
         this.metodoPagamento = metodoPagamento;
-        this.cashbackIsUsed = cashbackIsUsed;
-        this.imposto = imposto;
-        this.valor = valor;
-        this.frete = frete;
-        this.desconto = desconto;
     }
 
     public LocalDate getData() { return data; }
     public Cliente getCliente() { return cliente; }
     public Produto[] getItens() { return itens; }
     public String getMetodoPagamento() { return metodoPagamento; }
-    public Boolean getCashbackIsUsed() { return cashbackIsUsed; }
-    public float getImposto() { return imposto; }
-    public float getValor() { return valor; }
+    public float getICMS() { return icms; }
+    public float getImpostoMunicipal() { return impostoMunicipal; }
     public float getFrete() { return frete; }
     public float getDesconto() { return desconto; }
-
-    public void calcularTotais() {
-        calcularDesconto();
+    
+    public float getValor() {
+    	for(int i = 0; i < itens.length; i++) {
+    		valor += itens[i].getValor();
+    	}
+    	calcularDesconto();
         calcularFrete();
         calcularCashback();
+        calcularIcms();
+        calcularImpostoMunicipal();
+        valor -= desconto;
+        valor += frete;
+        valor += icms + impostoMunicipal;
+        return valor;
     }
 
-    private void calcularDesconto() {
-        if (cliente.getTipo() == TipoCliente.ESPECIAL) {
-            desconto = valor * 0.10f;
-            valor -= desconto;
+    public float calcularDesconto() {
+    	float valorItens = 0.0f;
+    	for(int i = 0; i < itens.length; i++) {
+    		valorItens += itens[i].getValor();
+    	}
+    	if (cliente.getTipo() == TipoCliente.ESPECIAL) {
+    		desconto = valorItens * 0.10f;
             if (metodoPagamento.startsWith("429613")) {
-                float extraDesconto = valor * 0.10f;
-                desconto += extraDesconto;
-                valor -= extraDesconto;
+            	desconto += valorItens * 0.10f;
             }
         }
+        return desconto;
+    }
+    
+    public float calcularImpostoMunicipal() {
+    	float valorItens = 0.0f;
+    	for(int i = 0; i < itens.length; i++) {
+    		valorItens += itens[i].getValor();
+    	}
+    	if (cliente.getEndereco().getEstado() == Estado.DF) {
+    		return 0.0f;
+    	}
+    	impostoMunicipal = valorItens *0.12f;
+    	return impostoMunicipal;
+    }
+    
+    public float calcularIcms() {
+    	float valorItens = 0.0f;
+    	for(int i = 0; i < itens.length; i++) {
+    		valorItens += itens[i].getValor();
+    	}
+    	if (cliente.getEndereco().getEstado() == Estado.DF) {
+    		icms = valorItens * 0.18f;
+    	} else {
+    		icms = valorItens * 0.12f;
+    	}
+    	return icms;
     }
 
-    private void calcularFrete() {
-        Estado estado = cliente.getEndereco().getEstado();
+    public float calcularFrete() {
+        frete = 0.0f;
+    	Estado estado = cliente.getEndereco().getEstado();
         boolean isCapital = cliente.getEndereco().getCapital();
         Regiao regiao = estado.getRegiao();
 
@@ -87,13 +118,20 @@ public class Venda {
         } else if (cliente.getTipo() == TipoCliente.PRIME) {
             frete = 0.0f;
         }
+        return frete;
     }
 
-    private void calcularCashback() {
+    public float calcularCashback() {
+    	float valorItens = 0.0f;
+    	for(int i = 0; i < itens.length; i++) {
+    		valorItens += itens[i].getValor();
+    	}
         if (cliente.getTipo() == TipoCliente.PRIME) {
             float cashbackRate = metodoPagamento.startsWith("429613") ? 0.05f : 0.03f;
-            float cashback = valor * cashbackRate;
+            float cashback = valorItens * cashbackRate;
             cliente.setCashback(cliente.getCashback() + cashback);
+            return cashback;
         }
+        return 0.0f;
     }
 }

@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,24 +30,14 @@ public class ClienteEspecialTeste {
 				LocalDate.parse("2024-06-01", DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                 new Cliente(1, TipoCliente.PADRAO, new Endereco(Estado.DF, true), 5.0f),
                 new Produto[]{new Produto(1, "Produto1", 105.0f, "unidade")},
-                "429613XXXXXXXXXX",
-                false,
-                0.0f,
-                101.0f,
-                7.0f, 
-                0.0f
+                "429613XXXXXXXXXX"
         );
         Venda venda2 = new Venda(
       
 				LocalDate.parse("2024-05-05", DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                 new Cliente(1, TipoCliente.PADRAO, new Endereco(Estado.DF, true), 5.0f),
                 new Produto[]{new Produto(2, "Produto2", 200.0f, "unidade")},
-                "1234567890123456",
-                false,
-                0.0f,
-                200.0f,
-                7.0f,   
-                0.0f 
+                "1234567890123456"
             
         );
         Venda venda3 = new Venda(
@@ -56,12 +45,7 @@ public class ClienteEspecialTeste {
  				LocalDate.parse("2024-04-20", DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                  new Cliente(1, TipoCliente.PADRAO, new Endereco(Estado.DF, true), 5.0f),
                  new Produto[]{new Produto(3, "Produto3", 150.0f, "unidade")},
-                 "6543210987654321",
-                 false,
-                 0.0f,
-                 150.0f,
-                 7.0f,  
-                 0.0f
+                 "6543210987654321"
         );
 
         DataBaseProvider.getVendas().add(venda1);

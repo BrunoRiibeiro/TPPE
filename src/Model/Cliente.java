@@ -18,7 +18,6 @@ public class Cliente {
 
     //metodos
     public int getId() {
-    	System.out.println(id);
         return id;
     }
 
