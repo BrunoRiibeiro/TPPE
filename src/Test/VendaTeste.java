@@ -11,10 +11,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import Model.Cliente;
-import Model.Endereco;
-import Model.Produto;
-import Model.Venda;
+import Model.*;
 import Enum.Estado;
 import Enum.TipoCliente;
 
@@ -52,12 +49,12 @@ public class VendaTeste {
                 new Cliente(1, TipoCliente.PRIME, new Endereco(Estado.DF, true), 5.0f),
                 new Produto[]{new Produto(1, "Produto1", 100.0f, "unidade")},
                 "429613XXXXXXXXXX",
-                18.0f,
-                0.0f,
-                118.0f,
-                0.0f,   
-                0.0f,   
-                5.0f    
+                18.0f, //icms
+                0.0f, //impostoMunicipal
+                118.0f, //valor
+                0.0f,   //frete
+                0.0f,   //desconto
+                5.0f    //expectedCashback
             },
             {
                 LocalDate.parse("2024-06-01", DateTimeFormatter.ofPattern("yyyy-MM-dd")),
@@ -118,36 +115,36 @@ public class VendaTeste {
     @Test
     public void calcularDesconto() {
     	Venda venda = new Venda(data, cliente, itens, metodoPagamento);
-    	venda.calcularDesconto();
-    	float descontoEsperado = venda.getDesconto();
+    	VendaCalculator calculadora = new VendaCalculator(venda);
+    	float descontoEsperado = calculadora.calcularDesconto();
     	assertEquals(descontoEsperado, desconto, 0.1f);
     }
     @Test
     public void calcularFrete() {
     	Venda venda = new Venda(data, cliente, itens, metodoPagamento);
-    	venda.calcularFrete();
-    	float freteEsperado = venda.getFrete();
+		VendaCalculator calculadora = new VendaCalculator(venda);
+    	float freteEsperado = calculadora.calcularFrete();
     	assertEquals(freteEsperado, frete, 0.1f);
     }
     @Test
     public void calcularCashback() {
     	Venda venda = new Venda(data, cliente, itens, metodoPagamento);
-    	venda.calcularCashback();
-    	float cashbackEsperado = cliente.getCashback();
+		VendaCalculator calculadora = new VendaCalculator(venda);
+    	float cashbackEsperado = calculadora.calcularCashback();
     	assertEquals(cashbackEsperado, expectedCashback, 0.1f);
     }
     @Test
     public void calcularIcms() {
     	Venda venda = new Venda(data, cliente, itens, metodoPagamento);
-    	venda.calcularIcms();
-    	float icmsEsperado = venda.getICMS();
+		VendaCalculator calculadora = new VendaCalculator(venda);
+    	float icmsEsperado = calculadora.calcularIcms();
     	assertEquals(icmsEsperado, icms, 0.1f);
     }
     @Test
     public void calcularImpostoMunicipal() {
     	Venda venda = new Venda(data, cliente, itens, metodoPagamento);
-    	venda.calcularImpostoMunicipal();
-    	float impostoEsperado = venda.getImpostoMunicipal();
+		VendaCalculator calculadora = new VendaCalculator(venda);
+    	float impostoEsperado = calculadora.calcularImpostoMunicipal();
     	assertEquals(impostoEsperado, impostoMunicipal, 0.1f);
     }
 }
